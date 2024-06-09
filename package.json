@@ -1,0 +1,25 @@
+{
+  "name": "litlyx-js",
+  "version": "1.0.0",
+  "description": "LitLyx provides real-time analytics/kpi & custom events for 15+ JS/TS frameworks with one-line code implementation.",
+  "main": "node/litlyx.js",
+  "scripts": {
+    "build": "npm run build:node && npm run build:browser",
+    "build:node": "tsc -p tsconfig.json",
+    "build:browser": "webpack --config webpack.config.ts"
+  },
+  "keywords": [],
+  "author": "Emily",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/node-fetch": "^2.6.11",
+    "@types/webpack": "^5.28.5",
+    "node-fetch": "^2.6.1",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
