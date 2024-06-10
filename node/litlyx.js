@@ -45,26 +45,6 @@ class Litlyx {
         };
         addEventListener('popstate', () => me.pushVisit());
     }
-    async pushLeave() {
-        if (!(0, utils_1.isClient)())
-            return;
-        if (!this.initialized)
-            return console.error('Not initialized');
-        if (!this.project_id)
-            return console.error('project_id is required');
-        if (!this.settings)
-            return console.error('You must call init before pushing');
-        if (!this.initialized)
-            return console.error('Not initialized');
-        if (!this.project_id)
-            return console.error('project_id is required');
-        await (0, requester_1.sendRequest)(this.project_id, '/event', {
-            website: location.host,
-            page: location.pathname,
-            referrer: document.referrer || 'self',
-            userAgent: navigator.userAgent || ''
-        }, this.settings?.testMode);
-    }
     /**
      *
      * @param {string} name - Name of the event to log
@@ -78,7 +58,12 @@ class Litlyx {
         if (!this.settings)
             return console.error('You must call init before pushing');
         const metadata = options?.metadata ? JSON.stringify(options.metadata) : undefined;
-        await (0, requester_1.sendRequest)(this.project_id, '/event', { name, metadata, userAgent: navigator.userAgent || '' }, this.settings?.testMode);
+        await (0, requester_1.sendRequest)(this.project_id, '/event', {
+            name,
+            metadata,
+            website: location.host || 'SERVER_SIDE',
+            userAgent: navigator.userAgent || 'SERVER_SIDE'
+        }, this.settings?.testMode);
     }
     /**
      * Triggers a page visit event using current settings.

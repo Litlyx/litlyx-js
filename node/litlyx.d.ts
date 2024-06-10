@@ -14,7 +14,6 @@ declare class Litlyx {
      */
     init(project_id: string, settings?: Settings): void;
     private hookHistory;
-    pushLeave(): Promise<void>;
     /**
      *
      * @param {string} name - Name of the event to log
