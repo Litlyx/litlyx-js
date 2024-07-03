@@ -1,6 +1,5 @@
+import { SettingsServer } from './types';
 import { isClient } from './utils';
-
-const HOST = 'broker.litlyx.com';
 
 /**
  * @param project_id - Project id on Litlyx dashboard
@@ -8,12 +7,8 @@ const HOST = 'broker.litlyx.com';
  * 
  * Send a POST request
  */
-export function sendRequest(project_id: string, endpoint: string, body: Record<string, any>, testMode: boolean = false) {
-    if (testMode) {
-        sendServerRequest('127.0.0.1', endpoint, 8099, false, { ...body, pid: project_id });
-    } else {
-        sendServerRequest(HOST, endpoint, 443, true, { ...body, pid: project_id });
-    }
+export function sendRequest(project_id: string, endpoint: string, body: Record<string, any>, serverSettings: SettingsServer) {
+    sendServerRequest(serverSettings.host, endpoint, serverSettings.port, serverSettings.secure, { ...body, pid: project_id });
 }
 
 

@@ -23,14 +23,20 @@ class Litlyx {
             console.log('INIT');
         this.initialized = true;
         this.project_id = project_id;
-        this.settings = { testMode: false, ...settings };
+        this.settings = {
+            testMode: false,
+            server: {
+                host: 'broker.litlyx.com', port: 443, secure: true
+            },
+            ...settings
+        };
         if (!(0, utils_1.isClient)())
             return;
         this.pushVisit();
         this.hookHistory();
-        (0, requester_1.sendRequest)(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '', instant: true }, this.settings?.testMode);
+        (0, requester_1.sendRequest)(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '', instant: true }, this.settings.server);
         setInterval(() => {
-            (0, requester_1.sendRequest)(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '' }, this.settings?.testMode);
+            (0, requester_1.sendRequest)(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '' }, this.settings.server);
         }, 1000 * 60 * 1);
     }
     hookHistory() {
@@ -63,7 +69,7 @@ class Litlyx {
             metadata,
             website: location.host || 'SERVER_SIDE',
             userAgent: navigator.userAgent || 'SERVER_SIDE'
-        }, this.settings?.testMode);
+        }, this.settings.server);
     }
     /**
      * Triggers a page visit event using current settings.
@@ -86,7 +92,7 @@ class Litlyx {
             page: location.pathname,
             referrer: document.referrer || 'self',
             userAgent: navigator.userAgent || ''
-        }, this.settings?.testMode);
+        }, this.settings.server);
     }
 }
 /**
@@ -98,9 +104,17 @@ if ((0, utils_1.isClient)()) {
     const scriptElem = document.querySelector('script[data-project]');
     if (scriptElem) {
         const project_id = scriptElem.getAttribute('data-project');
-        const testMode = scriptElem.getAttribute('data-test-mode');
+        const host = scriptElem.getAttribute('data-host');
+        const port = scriptElem.getAttribute('data-port');
+        const secure = scriptElem.getAttribute('data-secure');
         if (project_id) {
-            exports.Lit.init(project_id, { testMode: testMode == 'true' });
+            exports.Lit.init(project_id, {
+                server: {
+                    host: host || 'broker.litlyx.com',
+                    port: port ? parseInt(port) : 443,
+                    secure: secure ? (secure === 'true' ? true : false) : true
+                }
+            });
         }
     }
 }
