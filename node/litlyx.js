@@ -25,6 +25,7 @@ class Litlyx {
         this.project_id = project_id;
         this.settings = {
             testMode: false,
+            manualMode: false,
             server: {
                 host: 'broker.litlyx.com', port: 443, secure: true
             },
@@ -32,12 +33,20 @@ class Litlyx {
         };
         if (!(0, utils_1.isClient)())
             return;
-        this.pushVisit();
-        this.hookHistory();
+        if (!this.settings.manualMode) {
+            this.pushVisit();
+            this.hookHistory();
+        }
         (0, requester_1.sendRequest)(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '', instant: true }, this.settings.server);
+        let durationCounter = 0;
         setInterval(() => {
-            (0, requester_1.sendRequest)(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '' }, this.settings.server);
-        }, 1000 * 60 * 1);
+            if (!document.hidden)
+                durationCounter += 10;
+            if (durationCounter >= 60) {
+                durationCounter -= 60;
+                (0, requester_1.sendRequest)(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '' }, this.settings.server);
+            }
+        }, 1000 * 10);
     }
     hookHistory() {
         if (this.hooked)
@@ -74,7 +83,7 @@ class Litlyx {
     /**
      * Triggers a page visit event using current settings.
      */
-    async pushVisit() {
+    async pushVisit(page) {
         if (!(0, utils_1.isClient)())
             return;
         if (!this.initialized)
@@ -89,7 +98,7 @@ class Litlyx {
             return console.error('project_id is required');
         await (0, requester_1.sendRequest)(this.project_id, '/visit', {
             website: location.host,
-            page: location.pathname,
+            page: page ?? location.pathname,
             referrer: document.referrer || 'self',
             userAgent: navigator.userAgent || ''
         }, this.settings.server);
@@ -107,12 +116,15 @@ if ((0, utils_1.isClient)()) {
         const host = scriptElem.getAttribute('data-host');
         const port = scriptElem.getAttribute('data-port');
         const secure = scriptElem.getAttribute('data-secure');
+        const manual = scriptElem.getAttribute('data-manual');
         if (project_id) {
+            console.log('Litlyx init on project', project_id);
             exports.Lit.init(project_id, {
+                manualMode: manual ? (manual === 'true' ? true : false) : false,
                 server: {
                     host: host || 'broker.litlyx.com',
                     port: port ? parseInt(port) : 443,
-                    secure: secure ? (secure === 'true' ? true : false) : true
+                    secure: secure ? (secure === 'true' ? true : false) : true,
                 }
             });
         }

@@ -5,5 +5,10 @@ export type SettingsServer = {
     secure: boolean
 }
 
-export type Settings = { testMode?: boolean, server?: SettingsServer }
+export type Settings = {
+    testMode?: boolean,
+    server?: SettingsServer,
+    manualMode?: boolean
+}
+
 export type EventOptions = { metadata?: Record<string, (string | number)> }

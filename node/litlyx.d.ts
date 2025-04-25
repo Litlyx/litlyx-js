@@ -23,7 +23,7 @@ declare class Litlyx {
     /**
      * Triggers a page visit event using current settings.
      */
-    pushVisit(): Promise<void>;
+    pushVisit(page?: string): Promise<void>;
 }
 /**
  * Singleton instance of LitClass, accessible for import and use in other files.
