@@ -3,13 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendRequest = void 0;
 const utils_1 = require("./utils");
 /**
- * @param project_id - Project id on Litlyx dashboard
+ * @param workspace_id - Workspace id on Litlyx dashboard
  * @param body - Content of the request
  *
  * Send a POST request
  */
-function sendRequest(project_id, endpoint, body, serverSettings) {
-    sendServerRequest(serverSettings.host, endpoint, serverSettings.port, serverSettings.secure, { ...body, pid: project_id });
+function sendRequest(workspace_id, endpoint, body, serverSettings) {
+    sendServerRequest(serverSettings.host, endpoint, serverSettings.port, serverSettings.secure, { ...body, pid: workspace_id });
 }
 exports.sendRequest = sendRequest;
 function sendServerRequest(host, path, port, secure, body) {

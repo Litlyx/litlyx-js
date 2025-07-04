@@ -2,13 +2,13 @@ import { SettingsServer } from './types';
 import { isClient } from './utils';
 
 /**
- * @param project_id - Project id on Litlyx dashboard
+ * @param workspace_id - Workspace id on Litlyx dashboard
  * @param body - Content of the request
  * 
  * Send a POST request
  */
-export function sendRequest(project_id: string, endpoint: string, body: Record<string, any>, serverSettings: SettingsServer) {
-    sendServerRequest(serverSettings.host, endpoint, serverSettings.port, serverSettings.secure, { ...body, pid: project_id });
+export function sendRequest(workspace_id: string, endpoint: string, body: Record<string, any>, serverSettings: SettingsServer) {
+    sendServerRequest(serverSettings.host, endpoint, serverSettings.port, serverSettings.secure, { ...body, pid: workspace_id });
 }
 
 

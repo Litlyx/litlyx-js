@@ -12,24 +12,24 @@ import { isClient } from "./utils";
  */
 class Litlyx {
 
-    private project_id?: string;
+    private workspace_id?: string;
     private initialized: boolean = false;
     private settings?: Required<Settings>;
     private hooked: boolean = false;
 
 
     /**
-     * Initializes the analytics with project ID and optional settings.
-     * @param {string} project_id - The project identifier.
+     * Initializes the analytics with workspace ID and optional settings.
+     * @param {string} workspace_id - The workspace identifier.
      * @param {Settings} [settings] - Optional settings for initialization.
      */
-    init(project_id: string, settings?: Settings) {
+    init(workspace_id: string, settings?: Settings) {
         if (this.initialized) return console.warn('Already initialized');
 
         if (settings?.testMode) console.log('INIT');
 
         this.initialized = true;
-        this.project_id = project_id;
+        this.workspace_id = workspace_id;
 
         this.settings = {
             testMode: false,
@@ -47,7 +47,7 @@ class Litlyx {
             this.hookHistory();
         }
 
-        sendRequest(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '', instant: true }, this.settings.server);
+        sendRequest(workspace_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '', instant: true }, this.settings.server);
 
 
         let durationCounter = 0;
@@ -56,7 +56,7 @@ class Litlyx {
             if (!document.hidden) durationCounter += 10;
             if (durationCounter >= 60) {
                 durationCounter -= 60;
-                sendRequest(project_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '' }, this.settings!.server);
+                sendRequest(workspace_id, '/keep_alive', { website: location.hostname, userAgent: navigator.userAgent || '' }, this.settings!.server);
             }
         }, 1000 * 10)
 
@@ -84,12 +84,12 @@ class Litlyx {
      */
     public async event(name: string, options?: EventOptions) {
         if (!this.initialized) return console.error('Not initialized');
-        if (!this.project_id) return console.error('project_id is required');
+        if (!this.workspace_id) return console.error('workspace_id is required');
         if (!this.settings) return console.error('You must call init before pushing');
 
         const metadata = options?.metadata ? JSON.stringify(options.metadata) : undefined;
 
-        await sendRequest(this.project_id, '/event', {
+        await sendRequest(this.workspace_id, '/event', {
             name,
             metadata,
             website: location.host || 'SERVER_SIDE',
@@ -105,13 +105,10 @@ class Litlyx {
         if (!isClient()) return;
 
         if (!this.initialized) return console.error('Not initialized');
-        if (!this.project_id) return console.error('project_id is required');
+        if (!this.workspace_id) return console.error('workspace_id is required');
         if (!this.settings) return console.error('You must call init before pushing');
 
-        if (!this.initialized) return console.error('Not initialized');
-        if (!this.project_id) return console.error('project_id is required');
-
-        await sendRequest(this.project_id, '/visit', {
+        await sendRequest(this.workspace_id, '/visit', {
             website: location.host,
             page: page ?? location.pathname,
             referrer: document.referrer || 'self',
@@ -124,27 +121,26 @@ class Litlyx {
 }
 
 /**
- * Singleton instance of LitClass, accessible for import and use in other files.
+ * Singleton instance of Litlyx, accessible for import and use in other files.
  */
 export const Lit = new Litlyx();
 
 
-
 if (isClient()) {
-    // Check if the script is imported with [data-project] and call init
-    const scriptElem = document.querySelector('script[data-project]');
+    // Check if the script is imported with [data-workspace] or [data-project] and call init
+    const scriptElem = document.querySelector('script[data-workspace]') ?? document.querySelector('script[data-project]');
     if (scriptElem) {
-        const project_id = scriptElem.getAttribute('data-project');
+        const workspace_id = scriptElem.getAttribute('data-workspace') ?? scriptElem.getAttribute('data-project');
 
         const host = scriptElem.getAttribute('data-host');
         const port = scriptElem.getAttribute('data-port');
         const secure = scriptElem.getAttribute('data-secure');
         const manual = scriptElem.getAttribute('data-manual');
 
-        if (project_id) {
-            console.log('Litlyx init on project', project_id);
+        if (workspace_id) {
+            console.log('Litlyx init on workspace', workspace_id);
 
-            Lit.init(project_id, {
+            Lit.init(workspace_id, {
                 manualMode: manual ? (manual === 'true' ? true : false) : false,
                 server: {
                     host: host || 'broker.litlyx.com',
