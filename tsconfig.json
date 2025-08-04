@@ -2,14 +2,16 @@
     "compilerOptions": {
         "module": "NodeNext",
         "target": "ESNext",
-        "outDir": "./node",
         "strict": true,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "declaration": true
+        "declaration": false,
+        "isolatedModules": true,
+        "skipLibCheck": true
     },
     "include": [
-        "src"
+        "src",
+        "tests"
     ],
     "exclude": [
         "node_modules"
